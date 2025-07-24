@@ -4,10 +4,12 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.IO;
 using BeB64GUI.Services;
+using Microsoft.Win32;
+using System.Windows.Input;
 
 
 
-namespace beb64GUI
+namespace BeB64GUI
 {
 
     public partial class MainWindow : Window
@@ -18,6 +20,42 @@ namespace beb64GUI
         {
             InitializeComponent();
             _statusTimer.Tick += (_, __) => StatusText.Text = "";
+        }
+
+        private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (SaveResultToFile())
+                SetStatus("Output saved.");
+        }
+
+        private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !string.IsNullOrWhiteSpace(ResultBox?.Text);
+        }
+
+        private bool SaveResultToFile()
+        {
+            if (string.IsNullOrWhiteSpace(ResultBox.Text))
+                return false;
+
+            var dlg = new SaveFileDialog
+            {
+                Title = "Save output",
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                FileName = "output.txt"
+            };
+
+            if (dlg.ShowDialog(this) == true)
+            {
+                File.WriteAllText(dlg.FileName, ResultBox.Text);
+                return true;
+            }
+            return false;
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
         private void SetStatus(string message, bool isError = false)
