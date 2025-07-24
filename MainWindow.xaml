@@ -1,0 +1,37 @@
+﻿<Window x:Class="beb64GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Base64 Encoder / Decoder" Height="400" Width="500" MinHeight="350" MinWidth="450">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Input -->
+        <TextBlock Text="Input (plain text or Base64):" Margin="0,0,0,6" />
+        <TextBox x:Name="InputBox" Grid.Row="1" Margin="0,0,0,10" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Height="100" TextWrapping="Wrap" />
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,10">
+            <Button Content="Encode →" Width="120" Margin="5" Click="Encode_Click" />
+            <Button Content="← Decode" Width="120" Margin="5" Click="Decode_Click" />
+            <Button Content="Clear" Width="80" Margin="5" Click="Clear_Click" />
+        </StackPanel>
+
+        <!-- Result -->
+        <StackPanel Grid.Row="3">
+            <TextBlock Text="Result:" Margin="0,0,0,6" />
+            <TextBox x:Name="ResultBox" Height="120" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" IsReadOnly="True"/>
+            <Button Content="Copy Result to Clipboard" HorizontalAlignment="Right" Margin="0,8,0,0" Width="200" Click="Copy_Click" />
+        </StackPanel>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="4">
+            <TextBlock x:Name="StatusText" />
+        </StatusBar>
+    </Grid>
+</Window>
