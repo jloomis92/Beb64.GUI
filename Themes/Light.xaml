@@ -1,5 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:pf="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+>
 
     <!-- =======================
          Colors
@@ -70,14 +72,34 @@
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
                     <Grid>
-                        <!-- Top-level header -->
+                        <!-- Header -->
                         <Border x:Name="Border"
-                            Background="{TemplateBinding Background}"
-                            Padding="{TemplateBinding Padding}">
-                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"/>
+                            Background="{TemplateBinding Background}">
+                            <Grid Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Text / header -->
+                                <ContentPresenter Grid.Column="0"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True"
+                                              VerticalAlignment="Center" />
+
+                                <!-- Arrow (hidden by default; only for submenu headers) -->
+                                <TextBlock x:Name="Arrow"
+                                       Grid.Column="1"
+                                       Text="›"
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource MenuForegroundBrush}"
+                                       Visibility="Collapsed"
+                                       FontSize="16" />
+                            </Grid>
                         </Border>
 
-                        <!-- Popup for submenus (open BELOW, larger size) -->
+                        <!-- Popup -->
                         <Popup x:Name="Popup"
                            Placement="Bottom"
                            IsOpen="{TemplateBinding IsSubmenuOpen}"
@@ -88,25 +110,37 @@
                                 Background="{DynamicResource MenuBackgroundBrush}"
                                 BorderBrush="{DynamicResource ControlBorderBrush}"
                                 BorderThickness="1"
-                                SnapsToDevicePixels="True"
-                                Padding="4">
-                                <!-- Added padding to enlarge popup -->
-                                <StackPanel IsItemsHost="True" 
+                                Padding="4"
+                                SnapsToDevicePixels="True">
+                                <StackPanel IsItemsHost="True"
                                         KeyboardNavigation.DirectionalNavigation="Cycle"
-                                        Margin="2"/>
-                                <!-- Slight margin inside -->
+                                        Margin="2" />
                             </Border>
                         </Popup>
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <!-- Hover state -->
+                        <!-- Show arrow only for submenu headers (NOT top-level headers) -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="HasItems" Value="True"/>
+                                <Condition Property="Role" Value="{x:Static pf:MenuItemRole.SubmenuHeader}"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible"/>
+                        </MultiTrigger>
+
+                        <!-- Top-level items explicitly hide the arrow -->
+                        <Trigger Property="Role" Value="{x:Static pf:MenuItemRole.TopLevelHeader}">
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <!-- Hover -->
                         <Trigger Property="IsHighlighted" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource ControlHoverBrush}" />
                             <Setter Property="Foreground" Value="{DynamicResource MenuForegroundBrush}" />
                         </Trigger>
 
-                        <!-- Disabled state -->
+                        <!-- Disabled -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
                         </Trigger>
@@ -115,8 +149,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-
 
 
     <!-- Separator -->
