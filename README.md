@@ -19,8 +19,8 @@ Built with **.NET 8**, it provides a simple, clean, and fast interface for devel
 ## **Screenshots**
 
 <p align="center">
-  <img src="beb64d.png" alt="Dark Theme" width="400"/>
-  <img src="beb64l.png" alt="Light Theme" width="400"/>
+  <img src="assets/beb64d.png" alt="Dark Theme" width="400"/>
+  <img src="assets/beb64l.png" alt="Light Theme" width="400"/>
 </p>
 
 ---
