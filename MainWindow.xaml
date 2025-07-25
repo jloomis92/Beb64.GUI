@@ -1,7 +1,10 @@
 ﻿<Window x:Class="BeB64GUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Base64 Encoder / Decoder" Height="400" Width="500" MinHeight="350" MinWidth="450">
+        Title="Base64 Encoder / Decoder" 
+        Height="400" Width="500" MinHeight="350" MinWidth="450"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource WindowForegroundBrush}">
 
     <!-- Commands / shortcuts -->
     <Window.CommandBindings>
@@ -14,7 +17,7 @@
         <KeyBinding Command="ApplicationCommands.Save" Modifiers="Control" Key="S"/>
     </Window.InputBindings>
 
-    <DockPanel>
+    <DockPanel Background="{DynamicResource WindowBackgroundBrush}">
 
         <!-- Menu (top) -->
         <Menu DockPanel.Dock="Top">
@@ -24,6 +27,22 @@
                           InputGestureText="Ctrl+S" />
                 <Separator />
                 <MenuItem Header="E_xit" Click="Exit_Click" />
+            </MenuItem>
+
+            <MenuItem Header="_View">
+                <MenuItem Header="_Theme">
+                    <MenuItem x:Name="LightThemeMenuItem"
+                              Header="_Light Theme"
+                              IsCheckable="true"                            
+                              Click="ThemeMenuItem_Click"
+                              Tag="Light"/>
+                    <MenuItem x:Name="DarkThemeMenuItem"
+                              Header="_Dark Theme"
+                              IsCheckable="true"
+                              Click="ThemeMenuItem_Click"
+                              Tag="Dark"/>
+
+                </MenuItem>
             </MenuItem>
         </Menu>
 

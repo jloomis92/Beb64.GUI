@@ -6,6 +6,8 @@ using System.IO;
 using BeB64GUI.Services;
 using Microsoft.Win32;
 using System.Windows.Input;
+using System.Windows.Controls;
+using Beb64.GUI.Theming;
 
 
 
@@ -20,6 +22,9 @@ namespace BeB64GUI
         {
             InitializeComponent();
             _statusTimer.Tick += (_, __) => StatusText.Text = "";
+
+            LightThemeMenuItem.IsChecked = ThemeManager.CurrentTheme == AppTheme.Light;
+            DarkThemeMenuItem.IsChecked = ThemeManager.CurrentTheme == AppTheme.Dark;
         }
 
         private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -64,6 +69,27 @@ namespace BeB64GUI
             StatusText.Foreground = isError ? Brushes.IndianRed : Brushes.Gray;
             _statusTimer.Stop();
             _statusTimer.Start();
+        }
+
+        private void ThemeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem mi || mi.Tag is not string tag) return;
+
+            var theme = tag == "Dark" ? AppTheme.Dark : AppTheme.Light;
+            ThemeManager.ApplyTheme(theme);
+
+            LightThemeMenuItem.IsChecked = theme == AppTheme.Light;
+            DarkThemeMenuItem.IsChecked = theme == AppTheme.Dark;
+        }
+
+        private static void UncheckSiblings(MenuItem clicked)
+        {
+            if (clicked.Parent is not MenuItem parent) return;
+            foreach (var item in parent.Items)
+            {
+                if (item is MenuItem mi && mi != clicked && mi.IsCheckable)
+                    mi.IsChecked = false;
+            }
         }
 
         private void Encode_Click(object sender, RoutedEventArgs e)
