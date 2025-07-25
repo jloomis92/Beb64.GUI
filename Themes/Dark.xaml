@@ -24,24 +24,29 @@
     <!-- =======================
          Brushes
     ======================== -->
-    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource WindowBackgroundColor}" />
-    <SolidColorBrush x:Key="WindowForegroundBrush" Color="{DynamicResource WindowForegroundColor}" />
-    <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}" />
-    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{DynamicResource ControlBackgroundColor}" />
-    <SolidColorBrush x:Key="ControlBorderBrush" Color="{DynamicResource ControlBorderColor}" />
-    <SolidColorBrush x:Key="ControlHoverBrush" Color="{DynamicResource ControlHoverColor}" />
-    <SolidColorBrush x:Key="ControlPressedBrush" Color="{DynamicResource ControlPressedColor}" />
-    <SolidColorBrush x:Key="DisabledForegroundBrush" Color="{DynamicResource DisabledForegroundColor}" />
-    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="{DynamicResource DisabledBackgroundColor}" />
-    <SolidColorBrush x:Key="MenuBackgroundBrush" Color="{DynamicResource MenuBackgroundColor}" />
-    <SolidColorBrush x:Key="MenuForegroundBrush" Color="{DynamicResource MenuForegroundColor}" />
-    <!-- Make the submenu/drop-down use our themed colors -->
-    <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}"     Color="{Binding Source={StaticResource MenuBackgroundBrush}, Path=Color}" />
-    <SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}" Color="{Binding Source={StaticResource MenuForegroundBrush}, Path=Color}" />
-    <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="{DynamicResource StatusBarBackgroundColor}" />
-    <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="{DynamicResource StatusBarForegroundColor}" />
-    <SolidColorBrush x:Key="SelectionBackgroundBrush" Color="{DynamicResource SelectionBackgroundColor}" />
-    <SolidColorBrush x:Key="SelectionForegroundBrush" Color="{DynamicResource SelectionForegroundColor}" />
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}" />
+    <SolidColorBrush x:Key="WindowForegroundBrush" Color="{StaticResource WindowForegroundColor}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource ControlBackgroundColor}" />
+    <SolidColorBrush x:Key="ControlBorderBrush" Color="{StaticResource ControlBorderColor}" />
+    <SolidColorBrush x:Key="ControlHoverBrush" Color="{StaticResource ControlHoverColor}" />
+    <SolidColorBrush x:Key="ControlPressedBrush" Color="{StaticResource ControlPressedColor}" />
+    <SolidColorBrush x:Key="DisabledForegroundBrush" Color="{StaticResource DisabledForegroundColor}" />
+    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="{StaticResource DisabledBackgroundColor}" />
+    <SolidColorBrush x:Key="MenuBackgroundBrush" Color="{StaticResource MenuBackgroundColor}" />
+    <SolidColorBrush x:Key="MenuForegroundBrush" Color="{StaticResource MenuForegroundColor}" />
+    <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="{StaticResource StatusBarBackgroundColor}" />
+    <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="{StaticResource StatusBarForegroundColor}" />
+    <SolidColorBrush x:Key="SelectionBackgroundBrush" Color="{StaticResource SelectionBackgroundColor}" />
+    <SolidColorBrush x:Key="SelectionForegroundBrush" Color="{StaticResource SelectionForegroundColor}" />
+
+    <!-- (Optional) If you still want to recolor the default popup using SystemColors,
+         do it *without* Binding. Uncomment if needed.
+    <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}"
+                     Color="{StaticResource MenuBackgroundColor}" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}"
+                     Color="{StaticResource MenuForegroundColor}" />
+    -->
 
     <!-- =======================
          Window
@@ -64,6 +69,7 @@
     </Style>
 
     <!-- MenuItem -->
+    <!-- MenuItem -->
     <Style TargetType="MenuItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MenuForegroundBrush}" />
@@ -72,24 +78,36 @@
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
                     <Grid>
-                        <!-- Header -->
-                        <Border x:Name="Border"
-                            Background="{TemplateBinding Background}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}">
                             <Grid Margin="{TemplateBinding Padding}">
                                 <Grid.ColumnDefinitions>
+                                    <!-- Column for bullet/check -->
+                                    <ColumnDefinition Width="16"/>
+                                    <!-- Column for text -->
                                     <ColumnDefinition />
+                                    <!-- Column for arrow -->
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Text / header -->
-                                <ContentPresenter Grid.Column="0"
+                                <!-- Bullet (only shown when IsChecked=True) -->
+                                <TextBlock x:Name="CheckGlyph"
+                                       Grid.Column="0"
+                                       Text="•"
+                                       FontSize="14"
+                                       Margin="0,0,6,0"
+                                       Foreground="{DynamicResource MenuForegroundBrush}"
+                                       Visibility="Collapsed"
+                                       VerticalAlignment="Center"/>
+
+                                <!-- Text -->
+                                <ContentPresenter Grid.Column="1"
                                               ContentSource="Header"
                                               RecognizesAccessKey="True"
                                               VerticalAlignment="Center" />
 
-                                <!-- Arrow (hidden by default; only for submenu headers) -->
+                                <!-- Arrow -->
                                 <TextBlock x:Name="Arrow"
-                                       Grid.Column="1"
+                                       Grid.Column="2"
                                        Text="›"
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center"
@@ -120,18 +138,19 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <!-- Show arrow only for submenu headers (NOT top-level headers) -->
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="HasItems" Value="True"/>
-                                <Condition Property="Role" Value="{x:Static pf:MenuItemRole.SubmenuHeader}"/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible"/>
-                        </MultiTrigger>
+                        <!-- Show bullet when checked -->
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
+                        </Trigger>
 
-                        <!-- Top-level items explicitly hide the arrow -->
+                        <!-- Show arrow only for submenu headers -->
+                        <Trigger Property="Role" Value="{x:Static pf:MenuItemRole.SubmenuHeader}">
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
+                        <!-- Hide arrow for top-level headers -->
                         <Trigger Property="Role" Value="{x:Static pf:MenuItemRole.TopLevelHeader}">
-                            <Setter TargetName="Arrow" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Collapsed" />
                         </Trigger>
 
                         <!-- Hover -->
@@ -161,14 +180,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Separator">
                     <Rectangle Height="{TemplateBinding Height}"
-                           Fill="{TemplateBinding Background}" />
+                               Fill="{TemplateBinding Background}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-
-
-
 
     <!-- =======================
          StatusBar
