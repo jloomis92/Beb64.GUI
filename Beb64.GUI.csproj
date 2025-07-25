@@ -6,10 +6,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <AssemblyName>Beb64.GUI</AssemblyName>
+    <RootNamespace>Beb64.GUI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ModernWPF" Version="1.4.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>

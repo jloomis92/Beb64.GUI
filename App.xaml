@@ -1,11 +1,12 @@
 ﻿<Application x:Class="Beb64.GUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Beb64.GUI">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
+        <!-- Load a *valid, existing* default so the designer/XAML compiler is happy -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/Light.xaml"/>
+                <!-- Make sure the *folder and file names* exactly match these -->
+                <ResourceDictionary Source="Themes/Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

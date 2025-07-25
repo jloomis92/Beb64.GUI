@@ -1,26 +1,19 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Beb64.GUI.Theming;
-using Beb64.GUI;
-
+﻿using System.Windows;
+using Beb64.GUI.Services;
+using Beb64.GUI.Views;
 
 namespace Beb64.GUI
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            string savedTheme = global::Beb64.GUI.Properties.Settings.Default.DefaultTheme;
-            if (Enum.TryParse(savedTheme, out AppTheme theme))
-                ThemeManager.ApplyTheme(theme);
-            else
-                ThemeManager.ApplyTheme(AppTheme.Light); // Set default theme
+            // Let ThemeService swap the default Light dictionary with the saved one.
+            IThemeService themeService = new ThemeService();
+            themeService.ApplyTheme(themeService.GetSavedOrDefault());
+
             new MainWindow().Show();
         }
     }
