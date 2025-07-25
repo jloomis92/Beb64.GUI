@@ -1,7 +1,7 @@
 ﻿<Window x:Class="BeB64GUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Base64 Encoder / Decoder" 
+        Title="BeB64 - Base64 Encoder / Decoder" 
         Height="400" Width="500" MinHeight="350" MinWidth="450"
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource WindowForegroundBrush}">
@@ -32,13 +32,13 @@
             <MenuItem Header="_View">
                 <MenuItem Header="_Theme">
                     <MenuItem x:Name="LightThemeMenuItem"
-                              Header="_Light Theme"
-                              IsCheckable="true"                            
+                              Header="_Light"
+                              IsCheckable="True"                            
                               Click="ThemeMenuItem_Click"
                               Tag="Light"/>
                     <MenuItem x:Name="DarkThemeMenuItem"
-                              Header="_Dark Theme"
-                              IsCheckable="true"
+                              Header="_Dark"
+                              IsCheckable="True"
                               Click="ThemeMenuItem_Click"
                               Tag="Dark"/>
 

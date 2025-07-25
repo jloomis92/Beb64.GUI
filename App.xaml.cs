@@ -15,7 +15,12 @@ namespace Beb64.GUI
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            ThemeManager.ApplyTheme(AppTheme.Light); // Set default theme
+
+            string savedTheme = global::Beb64.GUI.Properties.Settings.Default.DefaultTheme;
+            if (Enum.TryParse(savedTheme, out AppTheme theme))
+                ThemeManager.ApplyTheme(theme);
+            else
+                ThemeManager.ApplyTheme(AppTheme.Light); // Set default theme
             new MainWindow().Show();
         }
     }

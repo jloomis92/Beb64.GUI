@@ -9,7 +9,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using Beb64.GUI.Theming;
 
-
+using AppSettings = Beb64.GUI.Properties.Settings;
 
 namespace BeB64GUI
 {
@@ -80,6 +80,9 @@ namespace BeB64GUI
 
             LightThemeMenuItem.IsChecked = theme == AppTheme.Light;
             DarkThemeMenuItem.IsChecked = theme == AppTheme.Dark;
+
+            AppSettings.Default.DefaultTheme = theme.ToString();
+            AppSettings.Default.Save();
         }
 
         private static void UncheckSiblings(MenuItem clicked)
