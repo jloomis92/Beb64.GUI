@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Reflection;
+using System.Windows;
 using Beb64.GUI.Services;
 using Beb64.GUI.Views;
 
@@ -10,11 +11,15 @@ namespace Beb64.GUI
         {
             base.OnStartup(e);
 
-            // Let ThemeService swap the default Light dictionary with the saved one.
             IThemeService themeService = new ThemeService();
             themeService.ApplyTheme(themeService.GetSavedOrDefault());
 
-            new MainWindow().Show();
+            var ver = typeof(App).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion ?? "?.?.?";
+
+            MainWindow window = new MainWindow { Title = $"Beb64 {ver}" };
+            window.Show();
         }
     }
 }

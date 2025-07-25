@@ -1,33 +1,48 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
 
-    <AssemblyName>Beb64.GUI</AssemblyName>
-    <RootNamespace>Beb64.GUI</RootNamespace>
-  </PropertyGroup>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-  </ItemGroup>
+		<!-- Names / roots -->
+		<AssemblyName>Beb64.GUI</AssemblyName>
+		<RootNamespace>Beb64.GUI</RootNamespace>
 
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
+		<!-- We will OWN all assembly attributes in VersionInfo.cs -->
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+		<!-- You can still keep these for NuGet/file metadata if you want,
+         but they will NOT generate attributes anymore. Keep them in sync
+         with VersionInfo.cs manually or via your script. -->
+		<Version>1.0.2</Version>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.2.0</FileVersion>
+		<InformationalVersion>1.0.2</InformationalVersion>
+
+		<!-- Prevent MSBuild from trying to append +git-hash in various CI modes -->
+		<ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+		<DeterministicSourcePaths>false</DeterministicSourcePaths>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+
+		<None Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
 
 </Project>

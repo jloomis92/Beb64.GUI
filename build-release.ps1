@@ -4,30 +4,6 @@
     - dotnet publish (self-contained, single file)
     - Inno Setup compile
     - Opens the installer output folder
-
-.PARAMETER Project
-    Path to the .csproj (auto-detected if omitted)
-
-.PARAMETER Configuration
-    Build configuration. Default: Release
-
-.PARAMETER Runtime
-    Target runtime. Default: win-x64
-
-.PARAMETER Framework
-    Target framework. Default: net8.0
-
-.PARAMETER SelfContained
-    Build self-contained (true/false). Default: $true
-
-.PARAMETER SingleFile
-    Publish as single file (true/false). Default: $true
-
-.PARAMETER InnoSetupPath
-    Full path to ISCC.exe if not in default location/PATH.
-
-.PARAMETER IssFile
-    Path to your installer .iss script. Default: installer.iss in repo root
 #>
 
 [CmdletBinding()]
@@ -42,9 +18,21 @@ param(
     [string] $IssFile = (Join-Path $PSScriptRoot "BeB64.iss")
 )
 
+
 # -----------------------------
 # Helpers
 # -----------------------------
+
+function To-FileVersion([string]$v) {
+    $parts = $v.Split('.')
+    switch ($parts.Length) {
+        1 { return "$v.0.0.0" }
+        2 { return "$v.0.0"   }
+        3 { return "$v.0"     }
+        default { return $v } # already 4-part
+    }
+}
+
 function Fail($msg) {
     Write-Error $msg
     exit 1
@@ -70,7 +58,6 @@ function Get-ProjectVersion {
     $verNode = $xml.Project.PropertyGroup.Version | Select-Object -First 1
     if ($verNode) { return $verNode.Trim() }
 
-    # Fallback to AssemblyVersion/FileVersion if Version not present
     $asmVer = $xml.Project.PropertyGroup.AssemblyVersion | Select-Object -First 1
     if ($asmVer) { return $asmVer.Trim() }
 
@@ -82,11 +69,9 @@ function Find-Iscc {
 
     if ($explicitPath -and (Test-Path $explicitPath)) { return (Resolve-Path $explicitPath).Path }
 
-    # Check PATH
     $isccOnPath = Get-Command iscc.exe -ErrorAction SilentlyContinue
     if ($isccOnPath) { return $isccOnPath.Source }
 
-    # Common default install location
     $candidates = @(
         "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
         "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
@@ -108,6 +93,9 @@ $projectDir  = Split-Path $projectPath -Parent
 $projectName = Split-Path $projectPath -LeafBase
 
 $version = Get-ProjectVersion -csprojPath $projectPath
+$fileVersion = To-FileVersion $version
+Write-Host "✔ Version:     $version"     -ForegroundColor Cyan
+Write-Host "✔ FileVersion: $fileVersion" -ForegroundColor Cyan
 Write-Host "✔ Project:   $projectName" -ForegroundColor Cyan
 Write-Host "✔ Version:   $version" -ForegroundColor Cyan
 
@@ -120,7 +108,10 @@ $publishArgs = @(
     "--self-contained:$SelfContained",
     "/p:PublishSingleFile=$SingleFile",
     "/p:IncludeAllContentForSelfExtract=true",
-    "/p:PublishTrimmed=false"
+    "/p:PublishTrimmed=false",
+    "/p:Version=$version",
+    "/p:FileVersion=$fileVersion",
+    "/p:InformationalVersion=$version"
 )
 
 dotnet @publishArgs
@@ -140,18 +131,17 @@ if (-not (Test-Path $IssFile)) {
 $iscc = Find-Iscc -explicitPath $InnoSetupPath
 Write-Host "`n==> ISCC: $iscc" -ForegroundColor Yellow
 
-# We’ll build to Output\ under the script dir; let the .iss control that via OutputDir
 $issArgs = @(
     "/DMySourceDir=$publishDir",
-    "/DMyAppVersion=$version"
+    "/DMyAppVersion=$version"                # <-- pass version into the installer
 )
-& "$iscc" $issArgs "`"$IssFile`""
 
+& "$iscc" $issArgs "`"$IssFile`""
 if ($LASTEXITCODE -ne 0) {
     Fail "ISCC failed with exit code $LASTEXITCODE"
 }
 
-# Try to locate the output folder (default in the provided .iss is 'Output' next to the script)
+# Open output folder
 $outputDir = Join-Path (Split-Path $IssFile -Parent) "Output"
 if (Test-Path $outputDir) {
     Write-Host "`n✔ Installer built. Opening: $outputDir" -ForegroundColor Green
