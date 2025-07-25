@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 using Beb64.GUI.Theming;
-using BeB64GUI;
+using Beb64.GUI;
 
 
 namespace Beb64.GUI

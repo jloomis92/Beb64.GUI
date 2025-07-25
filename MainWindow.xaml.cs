@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.IO;
-using BeB64GUI.Services;
+using Beb64.GUI.Services;
 using Microsoft.Win32;
 using System.Windows.Input;
 using System.Windows.Controls;
@@ -11,7 +11,7 @@ using Beb64.GUI.Theming;
 
 using AppSettings = Beb64.GUI.Properties.Settings;
 
-namespace BeB64GUI
+namespace Beb64.GUI
 {
 
     public partial class MainWindow : Window

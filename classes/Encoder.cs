@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace BeB64GUI.Services
+namespace Beb64.GUI.Services
 {
     public static class Encoder
     {
