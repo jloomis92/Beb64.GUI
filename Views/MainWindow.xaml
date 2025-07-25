@@ -1,0 +1,106 @@
+﻿<Window x:Class="Beb64.GUI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:Beb64.GUI.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=True}"
+        Title="BeB64 - v1.0.0"
+        Height="400" Width="500" MinHeight="600" MinWidth="600"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource WindowForegroundBrush}">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <!-- Keyboard shortcuts -->
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SaveCommand}"   Modifiers="Control" Key="S"/>
+        <KeyBinding Command="{Binding EncodeCommand}" Modifiers="Control" Key="E"/>
+        <KeyBinding Command="{Binding DecodeCommand}" Modifiers="Control" Key="D"/>
+        <KeyBinding Command="{Binding ClearCommand}"  Modifiers="Control" Key="L"/>
+    </Window.InputBindings>
+
+    <DockPanel Background="{DynamicResource WindowBackgroundBrush}">
+
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Save Output..."
+                          Command="{Binding SaveCommand}"
+                          InputGestureText="Ctrl+S" />
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="_View">
+                <MenuItem Header="_Theme">
+                    <MenuItem Header="_Light"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsLightTheme}"
+                              Command="{Binding SetLightThemeCommand}" />
+                    <MenuItem Header="_Dark"
+                              IsCheckable="True"
+                              IsChecked="{Binding IsDarkTheme}"
+                              Command="{Binding SetDarkThemeCommand}" />
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- Status bar -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="{Binding StatusText}" />
+        </StatusBar>
+
+        <!-- Main content -->
+        <Grid Margin="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Input label -->
+                <RowDefinition Height="*"/>
+                <!-- Input box -->
+                <RowDefinition Height="Auto"/>
+                <!-- Buttons -->
+                <RowDefinition Height="Auto"/>
+                <!-- Result label -->
+                <RowDefinition Height="*"/>
+                <!-- Result box -->
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Input (plain text or Base64):"
+                       Margin="0,0,0,6"/>
+
+            <TextBox Grid.Row="1"
+                     Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                     MinHeight="80"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     TextWrapping="Wrap" />
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0,10,0,10">
+                <Button Content="Encode →"       Width="120" Margin="5" Command="{Binding EncodeCommand}" />
+                <Button Content="← Decode"        Width="120" Margin="5" Command="{Binding DecodeCommand}" />
+                <Button Content="Save Output..."  Width="120" Margin="5" Command="{Binding SaveCommand}" />
+                <Button Content="Clear"           Width="80"  Margin="5" Command="{Binding ClearCommand}" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="3"
+                       Text="Result:"
+                       Margin="0,10,0,6"/>
+
+            <TextBox Grid.Row="4"
+                     Text="{Binding ResultText}"
+                     MinHeight="120"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     TextWrapping="Wrap"
+                     IsReadOnly="True" />
+        </Grid>
+    </DockPanel>
+</Window>
