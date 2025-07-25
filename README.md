@@ -38,7 +38,7 @@ Get the latest version from the **[Releases](../../releases)** page:
 ## **Installation**
 
 1. Download the latest installer from [Releases](../../releases).
-2. Run the `Base64AppSetup.exe` file.
+2. Run the `BeB64-Setup` file.
 3. Follow the installation wizard to install the application.
 4. (Optional) Create a desktop shortcut during installation.
 
@@ -46,7 +46,7 @@ Get the latest version from the **[Releases](../../releases)** page:
 
 ## **Usage**
 
-1. Launch **Base64 Encoder / Decoder**.
+1. Launch **BeB64**.
 2. Paste or type your text into the **Input Box**.
 3. Click **"Encode →"** or **"← Decode"**.
 4. Copy the result to clipboard or save to file.
