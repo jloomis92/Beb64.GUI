@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Beb64.GUI.Services;
+using Beb64.GUI.Theming;
 
 namespace Beb64.GUI.ViewModels
 {

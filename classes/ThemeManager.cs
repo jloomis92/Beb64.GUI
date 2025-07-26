@@ -8,7 +8,6 @@ using System.Windows.Media;
 
 namespace Beb64.GUI.Theming
 {
-    public enum AppTheme { Light, Dark }
 
     public static class ThemeManager
     {
