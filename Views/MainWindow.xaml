@@ -47,6 +47,9 @@
                               Command="{Binding SetDarkThemeCommand}" />
                 </MenuItem>
             </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Click="About_Click"/>
+            </MenuItem>
         </Menu>
 
         <!-- Status bar -->
