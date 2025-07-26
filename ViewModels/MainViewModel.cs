@@ -10,10 +10,12 @@ namespace Beb64.GUI.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
+        private const string DEFAULT_STATUS = "Welcome to BeB64! Ready to encode or decode.";
+
         private readonly IBase64Service _base64 = new Base64Service();
         private readonly IThemeService _theme = new ThemeService();
 
-        private bool _updatingTheme;   // re-entrancy guard
+        private bool _updatingTheme;   // prevents recursion when toggling themes
 
         // ---------- State ----------
         [ObservableProperty]
@@ -26,7 +28,7 @@ namespace Beb64.GUI.ViewModels
         private string? resultText;
 
         [ObservableProperty]
-        private string? statusText;
+        private string statusText = DEFAULT_STATUS;   // <- default message
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EncodeCommand))]
@@ -65,6 +67,18 @@ namespace Beb64.GUI.ViewModels
         }
 
         // ---------- Commands ----------
+        public MainViewModel()
+        {
+            // Apply persisted theme & sync flags
+            var current = _theme.GetSavedOrDefault();
+            _theme.ApplyTheme(current);
+
+            _updatingTheme = true;
+            IsLightTheme = current == AppTheme.Light;
+            IsDarkTheme = current == AppTheme.Dark;
+            _updatingTheme = false;
+        }
+
         [RelayCommand(CanExecute = nameof(CanEncodeDecode))]
         private void Encode()
         {
@@ -72,7 +86,7 @@ namespace Beb64.GUI.ViewModels
             {
                 IsBusy = true;
                 ResultText = _base64.Encode(InputText ?? string.Empty);
-                StatusText = "Encoded.";
+                StatusText = "Encoded successfully.";
             }
             catch (Exception ex)
             {
@@ -94,7 +108,7 @@ namespace Beb64.GUI.ViewModels
                     return;
                 }
                 ResultText = result;
-                StatusText = "Decoded.";
+                StatusText = "Decoded successfully.";
             }
             catch (Exception ex)
             {
@@ -128,7 +142,7 @@ namespace Beb64.GUI.ViewModels
         {
             InputText = string.Empty;
             ResultText = string.Empty;
-            StatusText = "Cleared.";
+            StatusText = DEFAULT_STATUS;   // <- reset to default
         }
 
         [RelayCommand] private void Exit() => Application.Current.Shutdown();
@@ -147,18 +161,10 @@ namespace Beb64.GUI.ViewModels
                 IsDarkTheme = theme == AppTheme.Dark;
                 _updatingTheme = false;
             }
-        }
 
-        public MainViewModel()
-        {
-            // Apply persisted theme and sync flags
-            var current = _theme.GetSavedOrDefault();
-            _theme.ApplyTheme(current);
-
-            _updatingTheme = true;
-            IsLightTheme = current == AppTheme.Light;
-            IsDarkTheme = current == AppTheme.Dark;
-            _updatingTheme = false;
+            // Only overwrite the default welcome message—don’t spam status if user already did actions
+            if (StatusText == DEFAULT_STATUS)
+                StatusText = $"Theme set to {theme}.";
         }
     }
 }
