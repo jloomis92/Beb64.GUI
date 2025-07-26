@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
+using Beb64.GUI.Theming;
 
 namespace Beb64.GUI.Services
 {
     public class ThemeService : IThemeService
     {
-        public AppTheme Current { get; private set; } = AppTheme.Light;
+        public AppTheme Current { get; private set; }
 
         public void ApplyTheme(AppTheme theme)
         {
@@ -35,7 +36,7 @@ namespace Beb64.GUI.Services
         public AppTheme GetSavedOrDefault()
         {
             var saved = Properties.Settings.Default.DefaultTheme;
-            return Enum.TryParse<AppTheme>(saved, out var t) ? t : AppTheme.Light;
+            return Enum.TryParse(saved, out AppTheme t) ? t : AppTheme.Light;
         }
     }
 }
