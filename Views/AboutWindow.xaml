@@ -1,17 +1,19 @@
 ﻿<Window x:Class="Beb64.GUI.Views.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        mc:Ignorable="d"
+        xmlns:vm="clr-namespace:Beb64.GUI.ViewModels"
         Title="About BeB64"
         Height="360" Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource WindowForegroundBrush}"
-        ShowInTaskbar="False"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        ShowInTaskbar="False">
+
+    <!-- Bind the VM directly -->
+    <Window.DataContext>
+        <vm:AboutViewModel />
+    </Window.DataContext>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -43,35 +45,35 @@
             <StackPanel>
                 <TextBlock Text="BeB64 - Base64 Encoder / Decoder"
                            FontWeight="Bold" FontSize="18"/>
-                <TextBlock Text="{Binding Tagline, Mode=OneWay}" FontStyle="Italic" />
+                <TextBlock Text="{Binding Tagline}" FontStyle="Italic" />
             </StackPanel>
         </StackPanel>
 
         <!-- Version -->
         <TextBlock Grid.Row="1"
-                   Text="{Binding VersionLine, Mode=OneWay}"
+                   Text="{Binding VersionLine}"
                    Margin="0,0,0,8" />
 
         <!-- Publisher / Build -->
         <TextBlock Grid.Row="2" Margin="0,0,0,12" TextWrapping="Wrap">
             <Run Text="Publisher: " />
-            <Run Text="{Binding Publisher, Mode=OneWay}" />
+            <Run Text="{Binding Publisher}" />
             <LineBreak/>
             <Run Text="Built on: " />
-            <Run Text="{Binding BuildDate, Mode=OneWay}" />
+            <Run Text="{Binding BuildDate}" />
         </TextBlock>
 
         <!-- Links & Diagnostics -->
         <StackPanel Grid.Row="3" Margin="0,0,0,12">
             <TextBlock Margin="0,0,0,8" TextWrapping="Wrap">
                 <Run Text="Project: " />
-                <Hyperlink NavigateUri="{Binding ProjectUrl, Mode=OneWay}" RequestNavigate="Hyperlink_RequestNavigate">
-                    <Run Text="{Binding ProjectUrl, Mode=OneWay}" />
+                <Hyperlink Command="{Binding OpenUrlCommand}" CommandParameter="{Binding ProjectUrl}">
+                    <Run Text="{Binding ProjectUrl}" />
                 </Hyperlink>
                 <LineBreak/>
                 <Run Text="Issues: " />
-                <Hyperlink NavigateUri="{Binding IssuesUrl, Mode=OneWay}" RequestNavigate="Hyperlink_RequestNavigate">
-                    <Run Text="{Binding IssuesUrl, Mode=OneWay}" />
+                <Hyperlink Command="{Binding OpenUrlCommand}" CommandParameter="{Binding IssuesUrl}">
+                    <Run Text="{Binding IssuesUrl}" />
                 </Hyperlink>
             </TextBlock>
 
@@ -81,7 +83,7 @@
                           Background="{DynamicResource ControlBackgroundBrush}"
                           BorderBrush="{DynamicResource ControlBorderBrush}"
                           BorderThickness="1">
-                <TextBlock Text="{Binding DiagnosticsText, Mode=OneWay}"
+                <TextBlock Text="{Binding DiagnosticsText}"
                            FontFamily="Consolas"
                            TextWrapping="Wrap"
                            Padding="6"/>
@@ -90,8 +92,10 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Copy diagnostics" Margin="0,0,10,0" Width="130" Click="CopyDiagnostics_Click"/>
-            <Button Content="OK" Width="80" IsDefault="True" Click="Close_Click"/>
+            <Button Content="Copy diagnostics" Margin="0,0,10,0" Width="130"
+                    Command="{Binding CopyDiagnosticsCommand}"/>
+            <!-- IsCancel=True auto-closes a dialog window -->
+            <Button Content="OK" Width="80" IsDefault="True" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

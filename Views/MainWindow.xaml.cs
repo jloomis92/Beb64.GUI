@@ -8,8 +8,7 @@ namespace Beb64.GUI.Views
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            var about = new Views.AboutWindow { Owner = this };
-            about.ShowDialog();
+            new Views.AboutWindow { Owner = this }.ShowDialog();
         }
     }
 }
