@@ -66,6 +66,7 @@ TestResult.xml
 
 ## Installer scripts
 *.iss
+*.ps1
 
 ## Logs
 *.log
