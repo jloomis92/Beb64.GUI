@@ -29,8 +29,12 @@ namespace Beb64.GUI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         private string? resultText;
 
-        [ObservableProperty]
-        private string statusText = DEFAULT_STATUS;   // <- default message
+        private string _statusText;
+        public string StatusText
+        {
+            get => _statusText;
+            set { _statusText = value; OnPropertyChanged(); }
+        }
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EncodeCommand))]
@@ -170,6 +174,39 @@ namespace Beb64.GUI.ViewModels
             // Only overwrite the default welcome message—don’t spam status if user already did actions
             if (StatusText == DEFAULT_STATUS)
                 StatusText = $"Theme set to {theme}.";
+        }
+
+        partial void OnInputTextChanged(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                StatusText = "Input is empty.";
+            }
+            else if (IsValidBase64String(value))
+            {
+                StatusText = "Valid Base64 input.";
+            }
+            else
+            {
+                StatusText = "Invalid Base64 input.";
+            }
+        }
+
+        // Add this helper method to your ViewModel:
+        private bool IsValidBase64String(string base64)
+        {
+            if (string.IsNullOrWhiteSpace(base64))
+                return false;
+
+            base64 = base64.Trim().Replace("\r", "").Replace("\n", "");
+            if (base64.Length % 4 != 0)
+                return false;
+
+            return System.Text.RegularExpressions.Regex.IsMatch(
+                base64,
+                @"^[A-Za-z0-9+/]*={0,2}$",
+                System.Text.RegularExpressions.RegexOptions.None
+            );
         }
     }
 }
