@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=True}"
         Title="BeB64 - v1.0.0"
-        Height="400" Width="500" MinHeight="600" MinWidth="600"
+        Height="400" Width="500" MinHeight="600" MinWidth="700  "
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource WindowForegroundBrush}">
 
@@ -76,12 +76,34 @@
                        Text="Input (plain text or Base64):"
                        Margin="0,0,0,6"/>
 
-            <TextBox Grid.Row="1"
+            <TextBox x:Name="InputTextBox"
+                     Grid.Row="1"
                      Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                     TextChanged="InputTextBox_TextChanged"
                      MinHeight="80"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto"
-                     TextWrapping="Wrap" />
+                     TextWrapping="Wrap"
+                     AllowDrop="True"
+                     PreviewDragOver="InputTextBox_PreviewDragOver"
+                     PreviewDrop="InputTextBox_PreviewDrop"
+                     PreviewDragEnter="InputTextBox_PreviewDragEnter"
+                     PreviewDragLeave="InputTextBox_PreviewDragLeave"
+                     Background="{DynamicResource ControlBackgroundBrush}"
+                     Foreground="{DynamicResource WindowForegroundBrush}">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Style.Triggers>
+                            <Trigger Property="Tag" Value="DropReady">
+                                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="BorderThickness" Value="2" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
 
             <StackPanel Grid.Row="2"
                         Orientation="Horizontal"
@@ -89,7 +111,9 @@
                         Margin="0,10,0,10">
                 <Button Content="Encode →"       Width="120" Margin="5" Command="{Binding EncodeCommand}" />
                 <Button Content="← Decode"        Width="120" Margin="5" Command="{Binding DecodeCommand}" />
-                <Button Content="Save Output..."  Width="120" Margin="5" Command="{Binding SaveCommand}" />
+                <Button Content="Decode to File..." Width="140" Margin="5"
+                        Click="DecodeToFile_Click" />
+                <Button Content="Save Result..."  Width="120" Margin="5" Command="{Binding SaveCommand}" />
                 <Button Content="Clear"           Width="80"  Margin="5" Command="{Binding ClearCommand}" />
             </StackPanel>
 
@@ -103,7 +127,9 @@
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto"
                      TextWrapping="Wrap"
-                     IsReadOnly="True" />
+                     IsReadOnly="True"
+                     Background="{DynamicResource ControlBackgroundBrush}"
+                     Foreground="{DynamicResource WindowForegroundBrush}" />
         </Grid>
     </DockPanel>
 </Window>
