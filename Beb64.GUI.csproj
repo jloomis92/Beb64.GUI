@@ -26,6 +26,8 @@
 		<!-- Prevent MSBuild from trying to append +git-hash in various CI modes -->
 		<ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
 		<DeterministicSourcePaths>false</DeterministicSourcePaths>
+
+		<ApplicationIcon>assets\beb64.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
