@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Beb64.GUI.Services;
@@ -70,14 +71,17 @@ namespace Beb64.GUI.ViewModels
         // ---------- Commands ----------
         public MainViewModel()
         {
-            // Apply persisted theme & sync flags
-            var current = _theme.GetSavedOrDefault();
-            _theme.ApplyTheme(current);
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+                return;
 
-            _updatingTheme = true;
-            IsLightTheme = current == AppTheme.Light;
-            IsDarkTheme = current == AppTheme.Dark;
-            _updatingTheme = false;
+                // Apply persisted theme & sync flags
+                var current = _theme.GetSavedOrDefault();
+                _theme.ApplyTheme(current);
+
+                _updatingTheme = true;
+                IsLightTheme = current == AppTheme.Light;
+                IsDarkTheme = current == AppTheme.Dark;
+                _updatingTheme = false;
         }
 
         [RelayCommand(CanExecute = nameof(CanEncodeDecode))]
