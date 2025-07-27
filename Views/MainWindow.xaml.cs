@@ -230,16 +230,16 @@ namespace Beb64.GUI.Views
         private void InputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = (TextBox)sender;
-            bool isValid = IsValidBase64String(textBox.Text);
 
-            // Update border color for feedback
-            textBox.BorderBrush = isValid
-                ? System.Windows.Media.Brushes.Green
-                : System.Windows.Media.Brushes.Red;
-
-            // Update status text in ViewModel
+            // Update border color for feedback using ViewModel's logic
             if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                vm.StatusText = isValid ? "Valid Base64 input." : "Invalid Base64 input.";
+            {
+                bool isValid = vm.GetIsValidBase64(textBox.Text); // Call ViewModel's method
+                textBox.BorderBrush = isValid
+                    ? System.Windows.Media.Brushes.Green
+                    : System.Windows.Media.Brushes.Red;
+                // Do NOT set StatusText here; let ViewModel handle it via OnInputTextChanged
+            }
         }
 
         private string FormatBase64String(string base64, int lineLength = 76)

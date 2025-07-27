@@ -190,7 +190,7 @@ namespace Beb64.GUI.ViewModels
             }
             else
             {
-                StatusText = "Invalid Base64 input.";
+                StatusText = "Plain text input detected.";
             }
         }
 
@@ -204,11 +204,30 @@ namespace Beb64.GUI.ViewModels
             if (base64.Length % 4 != 0)
                 return false;
 
-            return System.Text.RegularExpressions.Regex.IsMatch(
-                base64,
-                @"^[A-Za-z0-9+/]*={0,2}$",
-                System.Text.RegularExpressions.RegexOptions.None
-            );
+            // Check regex pattern
+            if (!System.Text.RegularExpressions.Regex.IsMatch(
+                    base64,
+                    @"^[A-Za-z0-9+/]*={0,2}$",
+                    System.Text.RegularExpressions.RegexOptions.None))
+                return false;
+
+            // For short strings, require padding
+            if (base64.Length < 8 && !base64.Contains("="))
+                return false;
+
+            // Try to decode and re-encode (round-trip check)
+            try
+            {
+                var bytes = Convert.FromBase64String(base64);
+                var roundTrip = Convert.ToBase64String(bytes);
+                return base64.TrimEnd('=') == roundTrip.TrimEnd('=');
+            }
+            catch
+            {
+                return false;
+            }
         }
+
+        public bool GetIsValidBase64(string value) => IsValidBase64String(value);
     }
 }
