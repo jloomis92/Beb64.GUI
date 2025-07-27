@@ -75,17 +75,19 @@ namespace Beb64.GUI.ViewModels
         // ---------- Commands ----------
         public MainViewModel()
         {
+            _statusText = DEFAULT_STATUS; // Always initialize
+
             if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
                 return;
 
-                // Apply persisted theme & sync flags
-                var current = _theme.GetSavedOrDefault();
-                _theme.ApplyTheme(current);
+            // Apply persisted theme & sync flags
+            var current = _theme.GetSavedOrDefault();
+            _theme.ApplyTheme(current);
 
-                _updatingTheme = true;
-                IsLightTheme = current == AppTheme.Light;
-                IsDarkTheme = current == AppTheme.Dark;
-                _updatingTheme = false;
+            _updatingTheme = true;
+            IsLightTheme = current == AppTheme.Light;
+            IsDarkTheme = current == AppTheme.Dark;
+            _updatingTheme = false;
         }
 
         [RelayCommand(CanExecute = nameof(CanEncodeDecode))]

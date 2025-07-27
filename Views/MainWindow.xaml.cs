@@ -151,7 +151,7 @@ namespace Beb64.GUI.Views
                         File.WriteAllBytes(dialog.FileName, fileBytes);
                     }
 
-                    string fileType = GetFriendlyFileType(_lastFileExtension);
+                    string fileType = GetFriendlyFileType(_lastFileExtension ?? string.Empty);
                     if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
                         vm.StatusText = $"File saved as {Path.GetFileName(dialog.FileName)} ({fileType})";
 

@@ -31,7 +31,6 @@
                 <MenuItem Header="_Save Output..."
                           Command="{Binding SaveCommand}"
                           InputGestureText="Ctrl+S" />
-                <Separator />
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
 
