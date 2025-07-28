@@ -54,6 +54,20 @@
         <!-- Status bar -->
         <StatusBar DockPanel.Dock="Bottom">
             <TextBlock Text="{Binding StatusText}" />
+            <ProgressBar Width="120"
+                         Height="16"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressValue}"
+                         Visibility="{Binding IsProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Margin="8,0,0,0"/>
+            <ProgressBar Width="200"
+                         Height="16"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding FileProgressValue}"
+                         Visibility="{Binding IsFileProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Margin="8,0,0,0"/>
         </StatusBar>
 
         <!-- Main content -->

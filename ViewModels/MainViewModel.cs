@@ -91,22 +91,6 @@ namespace Beb64.GUI.ViewModels
         }
 
         [RelayCommand(CanExecute = nameof(CanEncodeDecode))]
-        private void Encode()
-        {
-            try
-            {
-                IsBusy = true;
-                ResultText = _base64.Encode(InputText ?? string.Empty);
-                StatusText = "Encoded successfully.";
-            }
-            catch (Exception ex)
-            {
-                StatusText = $"Encode failed: {ex.Message}";
-            }
-            finally { IsBusy = false; }
-        }
-
-        [RelayCommand(CanExecute = nameof(CanEncodeDecode))]
         private void Decode()
         {
             try
@@ -180,6 +164,9 @@ namespace Beb64.GUI.ViewModels
 
         partial void OnInputTextChanged(string? value)
         {
+            if (_suppressInputStatus)
+                return;
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 StatusText = "Input is empty.";
@@ -200,27 +187,22 @@ namespace Beb64.GUI.ViewModels
             if (string.IsNullOrWhiteSpace(base64))
                 return false;
 
-            base64 = base64.Trim().Replace("\r", "").Replace("\n", "");
-            if (base64.Length % 4 != 0)
+            // Remove all whitespace and line breaks
+            string clean = string.Concat(base64.Where(c => !char.IsWhiteSpace(c)));
+
+            if (clean.Length == 0 || clean.Length % 4 != 0)
                 return false;
 
-            // Check regex pattern
             if (!System.Text.RegularExpressions.Regex.IsMatch(
-                    base64,
+                    clean,
                     @"^[A-Za-z0-9+/]*={0,2}$",
                     System.Text.RegularExpressions.RegexOptions.None))
                 return false;
 
-            // For short strings, require padding
-            if (base64.Length < 8 && !base64.Contains("="))
-                return false;
-
-            // Try to decode and re-encode (round-trip check)
             try
             {
-                var bytes = Convert.FromBase64String(base64);
-                var roundTrip = Convert.ToBase64String(bytes);
-                return base64.TrimEnd('=') == roundTrip.TrimEnd('=');
+                Convert.FromBase64String(clean);
+                return true;
             }
             catch
             {
@@ -229,5 +211,279 @@ namespace Beb64.GUI.ViewModels
         }
 
         public bool GetIsValidBase64(string value) => IsValidBase64String(value);
+
+        [RelayCommand]
+        public async Task EncodeAsync()
+        {
+            IsProgressVisible = true;
+            ProgressValue = 0;
+            ProgressMaximum = 100;
+
+            var progress = new Progress<double>(value => ProgressValue = value);
+
+            try
+            {
+                // Add a minimum delay for UI visibility (for testing)
+                await Task.Delay(500);
+
+                ResultText = await _base64.EncodeAsync(InputText ?? string.Empty, progress);
+                StatusText = "Encoded successfully.";
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Encode failed: {ex.Message}";
+            }
+            finally
+            {
+                IsProgressVisible = false;
+            }
+        }
+
+        private bool _isProgressVisible;
+        public bool IsProgressVisible
+        {
+            get => _isProgressVisible;
+            set => SetProperty(ref _isProgressVisible, value);
+        }
+
+        private double _progressValue;
+        public double ProgressValue
+        {
+            get => _progressValue;
+            set => SetProperty(ref _progressValue, value);
+        }
+
+        private double _progressMaximum = 100;
+        public double ProgressMaximum
+        {
+            get => _progressMaximum;
+            set => SetProperty(ref _progressMaximum, value);
+        }
+
+        // Add these properties to your MainViewModel
+        private bool _isFileProgressVisible;
+        public bool IsFileProgressVisible
+        {
+            get => _isFileProgressVisible;
+            set => SetProperty(ref _isFileProgressVisible, value);
+        }
+
+        private double _fileProgressValue;
+        public double FileProgressValue
+        {
+            get => _fileProgressValue;
+            set => SetProperty(ref _fileProgressValue, value);
+        }
+
+        // Command to encode a file to Base64 and save output
+        [RelayCommand]
+        public async Task EncodeFileAsync(string inputFile)
+        {
+            IsFileProgressVisible = true;
+            FileProgressValue = 0;
+            var progress = new Progress<double>(v => FileProgressValue = v);
+
+            try
+            {
+                // Suggest output filename with "-encoded.txt" appended
+                string inputName = Path.GetFileNameWithoutExtension(inputFile);
+                string outputName = inputName + "-encoded.txt";
+
+                var dlg = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                    FileName = outputName
+                };
+                if (dlg.ShowDialog() == true)
+                {
+                    await _base64.EncodeFileToBase64Async(inputFile, dlg.FileName, progress);
+                    StatusText = $"File encoded to Base64 and saved to {dlg.FileName}.";
+                    ResultText = null;
+                    _suppressInputStatus = true;
+                    InputText = string.Empty;
+                    _suppressInputStatus = false;
+                    _ = ResetStatusAfterDelayAsync();
+                }
+                else
+                {
+                    StatusText = "Save canceled.";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"File encode failed: {ex.Message}";
+            }
+            finally
+            {
+                IsFileProgressVisible = false;
+                FileProgressValue = 0;
+            }
+        }
+
+        private async Task<bool> IsFileBase64Async(string filePath)
+        {
+            try
+            {
+                string sample;
+                using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+                {
+                    char[] buffer = new char[8192];
+                    int read = await reader.ReadAsync(buffer, 0, buffer.Length);
+                    sample = new string(buffer, 0, read);
+                }
+
+                // Remove BOM if present
+                if (sample.Length > 0 && sample[0] == '\uFEFF')
+                    sample = sample.Substring(1);
+
+                sample = string.Concat(sample.Where(c => !char.IsWhiteSpace(c)));
+
+                if (sample.Length == 0 || sample.Length % 4 != 0)
+                    return false;
+                if (!System.Text.RegularExpressions.Regex.IsMatch(
+                        sample,
+                        @"^[A-Za-z0-9+/]*={0,2}$",
+                        System.Text.RegularExpressions.RegexOptions.None))
+                    return false;
+                Convert.FromBase64String(sample);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task ProcessFileAsync(string inputFile)
+        {
+            IsFileProgressVisible = true;
+            FileProgressValue = 0;
+            var progress = new Progress<double>(v => FileProgressValue = v);
+
+            try
+            {
+                bool isBase64 = await IsFileBase64Async(inputFile);
+
+                string inputName = Path.GetFileNameWithoutExtension(inputFile);
+                string inputExt = Path.GetExtension(inputFile);
+                string baseName = inputName;
+                while (baseName.EndsWith("-encoded", StringComparison.OrdinalIgnoreCase) ||
+                       baseName.EndsWith("-decoded", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (baseName.EndsWith("-encoded", StringComparison.OrdinalIgnoreCase))
+                        baseName = baseName.Substring(0, baseName.Length - 8);
+                    else if (baseName.EndsWith("-decoded", StringComparison.OrdinalIgnoreCase))
+                        baseName = baseName.Substring(0, baseName.Length - 8);
+                }
+
+                string outputName;
+                string filter;
+
+                if (isBase64)
+                {
+                    outputName = baseName + "-decoded" + inputExt;
+                    filter = "All files (*.*)|*.*";
+                }
+                else
+                {
+                    outputName = baseName + "-encoded.txt";
+                    filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                }
+
+                var dlg = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = filter,
+                    FileName = outputName,
+                };
+                if (dlg.ShowDialog() == true)
+                {
+                    if (isBase64)
+                    {
+                        if (isBase64)
+                        {
+                            // Use streaming decode for large files, but pre-clean the file for whitespace and BOM
+                            try
+                            {
+                                // Create a temp file with cleaned Base64 (no whitespace, no BOM)
+                                string tempBase64File = Path.GetTempFileName();
+                                using (var reader = new StreamReader(inputFile, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+                                using (var writer = new StreamWriter(tempBase64File, false, System.Text.Encoding.UTF8))
+                                {
+                                    bool firstLine = true;
+                                    while (!reader.EndOfStream)
+                                    {
+                                        string line = await reader.ReadLineAsync() ?? "";
+                                        if (firstLine && line.Length > 0 && line[0] == '\uFEFF')
+                                            line = line.Substring(1);
+                                        firstLine = false;
+                                        foreach (char c in line)
+                                        {
+                                            // Only write valid Base64 characters
+                                            if ((c >= 'A' && c <= 'Z') ||
+                                                (c >= 'a' && c <= 'z') ||
+                                                (c >= '0' && c <= '9') ||
+                                                c == '+' || c == '/' || c == '=')
+                                            {
+                                                writer.Write(c);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                await _base64.DecodeBase64FileAsync(tempBase64File, dlg.FileName, progress);
+
+                                // Clean up temp file
+                                File.Delete(tempBase64File);
+
+                                StatusText = $"File decoded from Base64 and saved to {dlg.FileName}.";
+                                ResultText = null;
+                                _suppressInputStatus = true;
+                                InputText = string.Empty;
+                                _suppressInputStatus = false;
+                                _ = ResetStatusAfterDelayAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                StatusText = $"File decode failed: {ex.Message}";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await _base64.EncodeFileToBase64Async(inputFile, dlg.FileName, progress);
+                        StatusText = $"File encoded to Base64 and saved to {dlg.FileName}.";
+                        ResultText = null;
+                        InputText = string.Empty;
+                        _ = ResetStatusAfterDelayAsync();
+                    }
+                }
+                else
+                {
+                    StatusText = "Save canceled.";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"File process failed: {ex.Message}";
+            }
+            finally
+            {
+                IsFileProgressVisible = false;
+                FileProgressValue = 0;
+            }
+        }
+
+        // Helper method for delayed status reset
+        private async Task ResetStatusAfterDelayAsync(int milliseconds = 5000)
+        {
+            var currentStatus = StatusText;
+            await Task.Delay(milliseconds);
+            // Only reset if the status hasn't changed in the meantime
+            if (StatusText == currentStatus)
+                StatusText = DEFAULT_STATUS;
+        }
+
+        private bool _suppressInputStatus;
     }
 }

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
 using System.Text;
+using Beb64.GUI.ViewModels;
 
 namespace Beb64.GUI.Views
 {
@@ -52,53 +53,23 @@ namespace Beb64.GUI.Views
             e.Handled = true;
         }
 
-        private void InputTextBox_PreviewDrop(object sender, DragEventArgs e)
+        private async void InputTextBox_PreviewDrop(object sender, DragEventArgs e)
         {
-            ((TextBox)sender).Tag = null;
-            try
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files.Length > 0)
                 {
-                    var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                    if (files != null && files.Length > 0 && File.Exists(files[0]))
-                    {
-                        if (IsTextFile(files[0]))
-                        {
-                            string text = File.ReadAllText(files[0]);
-                            ((TextBox)sender).Text = text;
-                            _fullBase64 = null;
-                        }
-                        else
-                        {
-                            byte[] fileBytes = File.ReadAllBytes(files[0]);
-                            string base64 = Convert.ToBase64String(fileBytes);
-                            _fullBase64 = base64;
-                            _lastFileExtension = Path.GetExtension(files[0]);
+                    var file = files[0];
+                    var fileInfo = new FileInfo(file);
 
-                            int previewLength = 200;
-                            ((TextBox)sender).Text = base64.Length > previewLength
-                                ? base64.Substring(0, previewLength) + "\n...\n(Preview only. Will use full data for decode.)"
-                                : base64;
-                        }
-
-                        if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                            vm.StatusText = $"Loaded: {Path.GetFileName(files[0])} ({new FileInfo(files[0]).Length} bytes)";
-                    }
+                    // Use the smart process method instead of always encoding
+                    await (DataContext as MainViewModel)?.ProcessFileAsync(file);
+                    e.Handled = true;
+                    return;
                 }
             }
-            catch (IOException ioEx)
-            {
-                MessageBox.Show($"File error: {ioEx.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                    vm.StatusText = $"File error: {ioEx.Message}";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                    vm.StatusText = $"Unexpected error: {ex.Message}";
-            }
-            e.Handled = true;
+            // Existing logic for text drop...
         }
 
         private bool IsAnyFileDrag(DragEventArgs e)

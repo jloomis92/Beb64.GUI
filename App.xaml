@@ -1,13 +1,13 @@
 ﻿<Application x:Class="Beb64.GUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:Beb64.GUI.Services">
     <Application.Resources>
-        <!-- Load a *valid, existing* default so the designer/XAML compiler is happy -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Make sure the *folder and file names* exactly match these -->
                 <ResourceDictionary Source="Themes/Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
