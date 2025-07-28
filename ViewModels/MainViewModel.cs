@@ -398,6 +398,7 @@ namespace Beb64.GUI.ViewModels
                 };
                 if (dlg.ShowDialog() == true)
                 {
+                    StatusText = "Analyzing file...";
                     if (isBase64)
                     {
                         if (isBase64)
@@ -454,7 +455,9 @@ namespace Beb64.GUI.ViewModels
                         await _base64.EncodeFileToBase64Async(inputFile, dlg.FileName, progress);
                         StatusText = $"File encoded to Base64 and saved to {dlg.FileName}.";
                         ResultText = null;
+                        _suppressInputStatus = true;
                         InputText = string.Empty;
+                        _suppressInputStatus = false;
                         _ = ResetStatusAfterDelayAsync();
                     }
                 }
