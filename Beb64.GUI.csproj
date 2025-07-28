@@ -31,7 +31,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="assets\beb64.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="assets\beb64.png" />
 	</ItemGroup>
 
 	<ItemGroup>
