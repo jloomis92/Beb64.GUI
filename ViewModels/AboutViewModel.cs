@@ -17,6 +17,7 @@ namespace Beb64.GUI.ViewModels
         [ObservableProperty] private string buildDate = "";
         [ObservableProperty] private string projectUrl = "https://github.com/jloomis92/Beb64.GUI";
         [ObservableProperty] private string issuesUrl;
+        [ObservableProperty] private string base64InfoUrl = "https://en.wikipedia.org/wiki/Base64";
         [ObservableProperty] private string diagnosticsText = "";
 
         public AboutViewModel()

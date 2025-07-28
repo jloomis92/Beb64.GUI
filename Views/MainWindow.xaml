@@ -87,7 +87,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0"
-                       Text="Input (plain text or Base64):"
+                       Text="Input:"
                        Margin="0,0,0,6"/>
 
             <!-- Input TextBox (with watermark, matches output box) -->
