@@ -36,14 +36,7 @@ namespace Beb64.GUI.Views
 
         private void InputTextBox_PreviewDragOver(object sender, DragEventArgs e)
         {
-            if (IsAnyFileDrag(e))
-            {
-                e.Effects = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
+            e.Effects = DragDropEffects.Copy;
             e.Handled = true;
         }
 
@@ -60,16 +53,12 @@ namespace Beb64.GUI.Views
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (files.Length > 0)
                 {
-                    var file = files[0];
-                    var fileInfo = new FileInfo(file);
-
-                    // Use the smart process method instead of always encoding
-                    await (DataContext as MainViewModel)?.ProcessFileAsync(file);
-                    e.Handled = true;
-                    return;
+                    // Call your ViewModel's file processing method
+                    if (DataContext is MainViewModel vm)
+                        await vm.ProcessFileAsync(files[0]);
                 }
             }
-            // Existing logic for text drop...
+            e.Handled = true;
         }
 
         private bool IsAnyFileDrag(DragEventArgs e)
