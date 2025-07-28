@@ -7,6 +7,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Beb64.GUI.Services;
 using Beb64.GUI.Theming;
+using System.Runtime;
+using System.Runtime.InteropServices;
 
 namespace Beb64.GUI.ViewModels
 {
@@ -432,10 +434,14 @@ namespace Beb64.GUI.ViewModels
                                     }
                                 }
 
-                                await _base64.DecodeBase64FileAsync(tempBase64File, dlg.FileName, progress);
+                                await _base64.DecodeBase64FileAsync(tempBase64File, dlg.FileName, progress, bufferSize: 64 * 1024);
 
                                 // Clean up temp file
                                 File.Delete(tempBase64File);
+                                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                                GC.Collect();
+                                GC.WaitForPendingFinalizers();
+                                GC.Collect();
 
                                 StatusText = $"File decoded from Base64 and saved to {dlg.FileName}.";
                                 ResultText = null;

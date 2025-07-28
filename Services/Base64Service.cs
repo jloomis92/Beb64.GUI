@@ -83,25 +83,31 @@ namespace Beb64.GUI.Services
             await EncodeStreamToBase64Async(input, output, progress, bufferSize, input.Length);
         }
 
-        // To encode a file to Base64 (binary-safe)
+        // Streaming, memory-efficient: returns the Base64 string for a file without loading the whole file or output into memory.
         public async Task<string> EncodeFileToBase64StringAsync(string inputFile, IProgress<double>? progress = null)
         {
             const int bufferSize = 81920;
-            using var input = File.OpenRead(inputFile);
-            using var ms = new MemoryStream();
-            var buffer = new byte[bufferSize];
-            int read;
+            using var input = new FileStream(inputFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, useAsync: true);
+            using var output = new MemoryStream();
+            using var base64Transform = new ToBase64Transform();
+            using var cryptoStream = new CryptoStream(output, base64Transform, CryptoStreamMode.Write, leaveOpen: true);
+
             long totalRead = 0;
             long length = input.Length;
+            var buffer = new byte[bufferSize];
+            int read;
 
             while ((read = await input.ReadAsync(buffer, 0, buffer.Length)) > 0)
             {
-                ms.Write(buffer, 0, read);
+                await cryptoStream.WriteAsync(buffer, 0, read);
                 totalRead += read;
                 progress?.Report(length > 0 ? (double)totalRead / length * 100 : 0);
             }
+            await cryptoStream.FlushAsync();
 
-            var base64 = Convert.ToBase64String(ms.ToArray());
+            output.Position = 0;
+            using var reader = new StreamReader(output, Encoding.ASCII, detectEncodingFromByteOrderMarks: false, bufferSize: bufferSize, leaveOpen: true);
+            string base64 = await reader.ReadToEndAsync();
             return base64;
         }
 
@@ -221,6 +227,8 @@ namespace Beb64.GUI.Services
                 }
             }
 
+            base64Buffer.Clear();
+            base64Buffer = null;
             progress?.Report(100);
         }
     }
