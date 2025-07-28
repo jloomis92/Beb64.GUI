@@ -124,8 +124,7 @@
                         Margin="0,10,0,10">
                 <Button Content="Encode →"       Width="120" Margin="5" Command="{Binding EncodeCommand}" />
                 <Button Content="← Decode"        Width="120" Margin="5" Command="{Binding DecodeCommand}" />
-                <Button Content="Decode to File..." Width="140" Margin="5"
-                        Click="DecodeToFile_Click" />
+                <Button Content="Decode to File..." Width="140" Margin="5" Command="{Binding DecodeToFileCommand}" />
                 <Button Content="Save Result..."  Width="120" Margin="5" Command="{Binding SaveCommand}" />
                 <Button Content="Clear"           Width="80"  Margin="5" Command="{Binding ClearCommand}" />
             </StackPanel>

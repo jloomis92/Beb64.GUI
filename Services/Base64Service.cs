@@ -9,6 +9,8 @@ namespace Beb64.GUI.Services
 {
     public class Base64Service : IBase64Service
     {
+        private const int DefaultBufferSize = 1024 * 1024;
+
         public string Encode(string input)
         {
             if (string.IsNullOrEmpty(input)) return string.Empty;
@@ -72,7 +74,7 @@ namespace Beb64.GUI.Services
         // Add this overload to implement the interface method
         public Task<string> EncodeAsync(string input, IProgress<double> progress)
         {
-            return EncodeAsync(input, progress, 1024 * 1024);
+            return EncodeAsync(input, progress, DefaultBufferSize);
         }
 
         // Streaming encode for file input/output

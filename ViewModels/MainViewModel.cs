@@ -192,7 +192,8 @@ namespace Beb64.GUI.ViewModels
             // Remove all whitespace and line breaks
             string clean = string.Concat(base64.Where(c => !char.IsWhiteSpace(c)));
 
-            if (clean.Length == 0 || clean.Length % 4 != 0)
+            // Require a minimum length (optional, e.g., 8)
+            if (clean.Length < 8 || clean.Length % 4 != 0)
                 return false;
 
             if (!System.Text.RegularExpressions.Regex.IsMatch(
@@ -203,8 +204,9 @@ namespace Beb64.GUI.ViewModels
 
             try
             {
-                Convert.FromBase64String(clean);
-                return true;
+                // Try to decode and ensure the result is not empty
+                var bytes = Convert.FromBase64String(clean);
+                return bytes.Length > 0;
             }
             catch
             {
@@ -494,5 +496,36 @@ namespace Beb64.GUI.ViewModels
         }
 
         private bool _suppressInputStatus;
+
+        [RelayCommand]
+        public async Task DecodeToFileAsync()
+        {
+            var base64 = InputText ?? string.Empty;
+            if (!IsValidBase64String(base64))
+            {
+                StatusText = "Input is not a valid Base64 string.";
+                MessageBox.Show("Input is not a valid Base64 string.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "Save Decoded File",
+                Filter = "All Files|*.*"
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                try
+                {
+                    byte[] bytes = Convert.FromBase64String(string.Concat(base64.Where(c => !char.IsWhiteSpace(c))));
+                    await File.WriteAllBytesAsync(dlg.FileName, bytes);
+                    StatusText = $"File saved as {dlg.FileName}";
+                }
+                catch (Exception ex)
+                {
+                    StatusText = $"Error: {ex.Message}";
+                }
+            }
+        }
     }
 }

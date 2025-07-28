@@ -87,68 +87,6 @@ namespace Beb64.GUI.Views
             new Views.AboutWindow { Owner = this }.ShowDialog();
         }
 
-        private void DecodeToFile_Click(object sender, RoutedEventArgs e)
-        {
-            string base64 = _fullBase64 ?? InputTextBox.Text.Trim();
-            if (!IsValidBase64String(base64))
-            {
-                MessageBox.Show("Input is not a valid Base64 string.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                    vm.StatusText = "Input is not a valid Base64 string.";
-                return;
-            }
-
-            var dialog = new Microsoft.Win32.SaveFileDialog
-            {
-                Title = "Save Decoded File",
-                Filter = "All Files|*.*",
-                DefaultExt = _lastFileExtension ?? ""
-            };
-            if (_lastFileExtension != null)
-                dialog.FileName = $"decoded{_lastFileExtension}";
-
-            if (dialog.ShowDialog() == true)
-            {
-                try
-                {
-                    byte[] fileBytes = Convert.FromBase64String(base64.Replace("\n", "").Replace("\r", ""));
-                    if (IsTextFile(dialog.FileName))
-                    {
-                        string text = Encoding.UTF8.GetString(fileBytes);
-                        File.WriteAllText(dialog.FileName, text);
-                    }
-                    else
-                    {
-                        File.WriteAllBytes(dialog.FileName, fileBytes);
-                    }
-
-                    string fileType = GetFriendlyFileType(_lastFileExtension ?? string.Empty);
-                    if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                        vm.StatusText = $"File saved as {Path.GetFileName(dialog.FileName)} ({fileType})";
-
-                    MessageBox.Show($"File saved successfully as {Path.GetFileName(dialog.FileName)} ({fileType})", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show("Input is not a valid Base64 string.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                        vm.StatusText = "Input is not a valid Base64 string.";
-                }
-                catch (IOException ioEx)
-                {
-                    MessageBox.Show($"File error: {ioEx.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                        vm.StatusText = $"File error: {ioEx.Message}";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    if (DataContext is Beb64.GUI.ViewModels.MainViewModel vm)
-                        vm.StatusText = $"Unexpected error: {ex.Message}";
-                }
-            }
-        }
-
         private void SaveEncodedOutput(string base64)
         {
             var dialog = new Microsoft.Win32.SaveFileDialog
